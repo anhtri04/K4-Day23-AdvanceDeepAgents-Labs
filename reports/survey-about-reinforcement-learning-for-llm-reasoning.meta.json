@@ -1,0 +1,26 @@
+{
+  "topic": "survey about reinforcement learning for LLM reasoning",
+  "model": "deepseek-chat",
+  "elapsed_s": 521.7,
+  "subagent_calls": 5,
+  "tool_calls": {
+    "ls": 1,
+    "execute": 6,
+    "read_file": 10,
+    "write_todos": 3,
+    "task": 5,
+    "write_file": 2,
+    "edit_file": 1
+  },
+  "tokens": {
+    "input": 543223,
+    "output": 14373
+  },
+  "n_sources": 33,
+  "source_families": [
+    "arxiv",
+    "hf-daily",
+    "hf-search",
+    "web"
+  ]
+}
