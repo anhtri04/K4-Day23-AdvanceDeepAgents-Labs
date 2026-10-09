@@ -62,66 +62,64 @@ Exa-specific). The Linkup implementation provides the equivalent robustness
 
 ## 5. Observed results
 
-### 5.1 Completed reports
+### 5.1 Completed reports (all 5 topics)
 
 | Topic | subagent_calls | sources | source_families | elapsed_s | tokens (in/out) | check |
 |---|---|---|---|---|---|---|
 | survey about world model | 6 | 61 | arxiv, hf-search, web | 682.1 | 699,765 / 17,293 | OK |
 | survey about reinforcement learning for LLM reasoning | 5 | 33 | arxiv, hf-daily, hf-search, web | 521.7 | 543,223 / 14,373 | OK |
-| survey about LLM agents and tool use | 7 | 75 | arxiv, hf-daily, hf-search, web | 284.8 | 982,178 / 20,136 | OK |
+| survey about LLM agents and tool use | 6 | 60 | arxiv, hf-search, web | 477.9 | 832,904 / 19,531 | OK |
 | survey about video and multimodal generation | 7 | 82 | arxiv, hf-daily, hf-search, web | 730.0 | 1,123,087 / 23,453 | OK |
+| survey about efficient inference and small language models | 6 | 87 | arxiv, hf-search, web | 1142.6 | 833,708 / 20,982 | OK |
 
-Total run time for 4 topics: ~2219 s (~37 min). Tokens are lead-only (subagent tokens
-are not counted, so real cost is higher).
+Tokens are lead-only (subagent tokens are not counted, so real cost is higher).
 
-All four reports satisfy:
+All five reports satisfy:
 - `subagent_calls >= 3` and at least 3 of 4 source families (RUBRIC 2.1, 2.2);
 - `check_citations.py` prints `OK: N sources, all citations resolve`;
-- no duplicate URLs and no source-family/URL mismatches (with one exception, see 6.1).
+- no duplicate URLs and no source-family/URL mismatches.
 
-`self_check.py` result: 4 topics `OK`, git/secrets `OK`, topic 5 missing (see 5.2).
+`self_check.py` result: **5 topics `OK`, git/secrets `OK` → READY to submit** (manual
+rubric items still graded by a person).
 
-### 5.2 Topic 5: pending
+### 5.2 Reliability note
 
-`survey about efficient inference and small language models` failed once with a
-transient `OpenAIConnectionError` (network). The run correctly wrote **no** report and
-exited non-zero - confirming the failure path of `save_outputs` / `main`. It will be
-re-run when the connection is stable.
+Topic 5 failed once with a transient `OpenAIConnectionError` (network). That run
+correctly wrote **no** report and exited non-zero, exercising the failure path of
+`save_outputs` / `main`; the re-run on a stable connection succeeded (see 5.1).
 
 ## 6. Known issues
 
-### 6.1 One source-family/URL mismatch (topic 3) - prompt fixed
-Source `n=74` is labeled `source="arxiv"` but its URL is
-`https://arxiv.org/html/2504.15546v2` instead of `https://arxiv.org/abs/2504.15546`.
-Per GUIDE 2.2 a paper found through web should be `source="web"` (or normalized to the
-`/abs/` URL). The report still has 3 valid families, so RUBRIC 2.2 passes. The report is
-**not** hand-edited (RUBRIC forbids post-hoc manual fixes).
+### 6.1 Source-family/URL mismatch (topic 3) - FIXED and confirmed
+The first topic-3 run had source `n=74` labeled `source="arxiv"` with an
+`https://arxiv.org/html/2504.15546v2` URL. Per GUIDE 2.2 a paper found through web should
+be `source="web"` (or normalized to the `/abs/` URL).
 
-Fix applied (prompt hardening, `agents.py`):
+Fix (prompt hardening, `agents.py`, no report hand-editing):
 - `LEAD_PROMPT` merge step: `source` is the **tool**, not the domain (web-found papers are
   `web`); arXiv URLs must be the canonical `https://arxiv.org/abs/<id>` (no `/html/`,
   `/pdf/`, or `vN`); a mandatory self-check of every manifest entry before writing.
 - `RESEARCHER_PROMPT`: same labeling rule plus canonical-URL rule in the note format.
-A re-run of topic 3 is needed to confirm the fix; pending.
+
+The topic-3 re-run is clean (0 mismatches, 0 duplicate URLs), confirming the fix.
 
 ### 6.2 Documentation drift
 `GUIDE.md` / `README.md` / `RUBRIC.md` reference Exa; the implementation now uses Linkup.
 
 ### 6.3 Cost
-Lead input tokens are ~3.3M across 4 topics (high because of many file reads and
+Lead input tokens are ~4.0M across the 5 topics (high because of many file reads and
 subagent results in context). Consider tightening `recursion_limit` / limits or the
 number of delegated sub-questions if cost matters.
 
 ## 7. Next steps
 
-1. Re-run topic 5 when the network is stable:
-   `.venv/bin/python research.py "survey about efficient inference and small language models"`.
-2. Re-run topic 3 to confirm the prompt hardening (arXiv URL normalization / source =
-   tool) removes the `n=74` mismatch.
-3. Inspect 5 random citations per report and open the sources (RUBRIC 4.2).
-4. Write the submission README (install + run + how to read `reports/`).
-5. Commit source + `reports/`, push to a **public** GitHub repo, and run
-   `.venv/bin/python self_check.py` until it prints READY.
+Done: all 5 topics generated, `check_citations.py` OK for each, `self_check.py` READY.
+
+Remaining:
+1. Inspect 5 random citations per report and open the sources (RUBRIC 4.2).
+2. Write the submission README (install + run + how to read `reports/`).
+3. Commit source + `reports/`, push to a **public** GitHub repo.
+4. Re-run `.venv/bin/python self_check.py` on the clean checkout.
 
 ## 8. How to run
 

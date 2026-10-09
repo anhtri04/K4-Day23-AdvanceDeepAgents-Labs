@@ -1,26 +1,24 @@
 {
   "topic": "survey about LLM agents and tool use",
   "model": "deepseek-chat",
-  "elapsed_s": 284.8,
-  "subagent_calls": 7,
+  "elapsed_s": 477.9,
+  "subagent_calls": 6,
   "tool_calls": {
-    "ls": 3,
-    "read_file": 12,
-    "write_todos": 3,
-    "task": 7,
+    "write_todos": 6,
+    "ls": 4,
+    "read_file": 11,
+    "task": 6,
     "write_file": 2,
-    "execute": 9,
-    "grep": 1,
+    "execute": 6,
     "edit_file": 1
   },
   "tokens": {
-    "input": 982178,
-    "output": 20136
+    "input": 832904,
+    "output": 19531
   },
-  "n_sources": 75,
+  "n_sources": 60,
   "source_families": [
     "arxiv",
-    "hf-daily",
     "hf-search",
     "web"
   ]
