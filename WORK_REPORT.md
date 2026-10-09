@@ -90,14 +90,19 @@ re-run when the connection is stable.
 
 ## 6. Known issues
 
-### 6.1 One source-family/URL mismatch (topic 3)
+### 6.1 One source-family/URL mismatch (topic 3) - prompt fixed
 Source `n=74` is labeled `source="arxiv"` but its URL is
 `https://arxiv.org/html/2504.15546v2` instead of `https://arxiv.org/abs/2504.15546`.
 Per GUIDE 2.2 a paper found through web should be `source="web"` (or normalized to the
-`/abs/` URL). The report still has 3 valid families, so RUBRIC 2.2 passes, but the
-prompt should be hardened to normalize arXiv HTML URLs to `/abs/` with `source=arxiv`.
-The report is **not** hand-edited (RUBRIC forbids post-hoc manual fixes); the fix belongs
-in the prompt/code and a re-run.
+`/abs/` URL). The report still has 3 valid families, so RUBRIC 2.2 passes. The report is
+**not** hand-edited (RUBRIC forbids post-hoc manual fixes).
+
+Fix applied (prompt hardening, `agents.py`):
+- `LEAD_PROMPT` merge step: `source` is the **tool**, not the domain (web-found papers are
+  `web`); arXiv URLs must be the canonical `https://arxiv.org/abs/<id>` (no `/html/`,
+  `/pdf/`, or `vN`); a mandatory self-check of every manifest entry before writing.
+- `RESEARCHER_PROMPT`: same labeling rule plus canonical-URL rule in the note format.
+A re-run of topic 3 is needed to confirm the fix; pending.
 
 ### 6.2 Documentation drift
 `GUIDE.md` / `README.md` / `RUBRIC.md` reference Exa; the implementation now uses Linkup.
@@ -111,8 +116,8 @@ number of delegated sub-questions if cost matters.
 
 1. Re-run topic 5 when the network is stable:
    `.venv/bin/python research.py "survey about efficient inference and small language models"`.
-2. (Optional) Harden `RESEARCHER_PROMPT`/`LEAD_PROMPT` to normalize arXiv URLs to
-   `https://arxiv.org/abs/<id>` and label web-found papers as `web`; then re-run topic 3.
+2. Re-run topic 3 to confirm the prompt hardening (arXiv URL normalization / source =
+   tool) removes the `n=74` mismatch.
 3. Inspect 5 random citations per report and open the sources (RUBRIC 4.2).
 4. Write the submission README (install + run + how to read `reports/`).
 5. Commit source + `reports/`, push to a **public** GitHub repo, and run
