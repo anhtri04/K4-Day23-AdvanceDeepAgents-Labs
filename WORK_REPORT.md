@@ -79,8 +79,8 @@ All five reports satisfy:
 - `check_citations.py` prints `OK: N sources, all citations resolve`;
 - no duplicate URLs and no source-family/URL mismatches.
 
-`self_check.py` result: **5 topics `OK`, git/secrets `OK` → READY to submit** (manual
-rubric items still graded by a person).
+`self_check.py` result: **5 topics `OK`**; `git/secrets` reports one **false positive**
+(a URL slug matched by the `sk-...` heuristic, see 6.4).
 
 ### 5.2 Reliability note
 
@@ -110,6 +110,25 @@ The topic-3 re-run is clean (0 mismatches, 0 duplicate URLs), confirming the fix
 Lead input tokens are ~4.0M across the 5 topics (high because of many file reads and
 subagent results in context). Consider tightening `recursion_limit` / limits or the
 number of delegated sub-questions if cost matters.
+
+### 6.4 `self_check.py` false positive: URL slug matched as a key - ACCEPTED
+`self_check.py` reports "contains something that looks like an API key" for:
+- `reports/survey-about-efficient-inference-and-small-language-models.md` (line `[13]`)
+- `reports/survey-about-efficient-inference-and-small-language-models.sources.json`
+
+The match is the substring `sk-specific-degradation-and-the-hard-limits-of-sub-4-bit-quantization`
+inside the cited URL
+`https://www.bestaiweb.ai/accuracy-collapse-task-specific-degradation-and-the-hard-limits-of-sub-4-bit-quantization/`
+(note `ta**sk-specific**`). The scanner's heuristic regex `sk-[A-Za-z0-9_\-]{20,}` is
+over-broad and matches many ordinary hyphenated URL slugs (`task-specific-...`,
+`risk-...`, `mask-...`, ...).
+
+This is **not a leaked secret**: `.env` is gitignored, no API key value appears in any
+tracked file, and the only genuine key material stays in `.env` on the host. The files
+are kept exactly as produced by the sandbox pipeline (they are **not** hand-edited, per
+RUBRIC). Decision: accept and document. If a reviewer runs `self_check.py`, the flagged
+line is a URL, not a credential. When tracking status, treat `git/secrets` as OK modulo
+this one documented false positive.
 
 ## 7. Next steps
 
